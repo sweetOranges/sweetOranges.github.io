@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-08-24T09:45:00.545Z</updated>
+  <updated>2016-08-24T09:50:55.898Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,14 +17,12 @@
   
   <entry>
     <title>如何搭建hexo博客系统</title>
-    <link href="http://yoursite.com/2016/08/24/hello-world/"/>
-    <id>http://yoursite.com/2016/08/24/hello-world/</id>
-    <published>2016-08-24T07:38:52.907Z</published>
-    <updated>2016-08-24T09:45:00.545Z</updated>
+    <link href="http://yoursite.com/2016/08/24/%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BAhexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/"/>
+    <id>http://yoursite.com/2016/08/24/如何搭建hexo博客系统/</id>
+    <published>2016-08-24T09:49:46.000Z</published>
+    <updated>2016-08-24T09:50:55.898Z</updated>
     
-    <content type="html"><![CDATA[<h4 id="导语"><a href="#导语" class="headerlink" title="导语:"></a>导语:</h4><ul>
-<li>作为一名程序开发人员，拥有一个独立的个人博客系统是一个非常不错的选择，<br>通过博客系统我们不仅能够加深对知识的掌握，同时也还能帮助别人解决问题。<br><a href="https://hexo.io/zh-cn/" target="_blank" rel="external">hexo</a>是一款快速、简介高效的博客框架，今天介绍一下<br>如何在github上搭建自己的个人博客系统</li>
-</ul>
+    <content type="html"><![CDATA[<p>作为一名程序开发人员，拥有一个独立的个人博客系统是一个非常不错的选择，<br>通过博客系统我们不仅能够加深对知识的掌握，同时也还能帮助别人解决问题。<br><a href="https://hexo.io/zh-cn/" target="_blank" rel="external">hexo</a>是一款快速、简介高效的博客框架，今天介绍一下<br>如何在github上搭建自己的个人博客系统</p>
 <a id="more"></a>
 <h1 id="一、注册github账号"><a href="#一、注册github账号" class="headerlink" title="一、注册github账号"></a>一、注册github账号</h1><p>首先打开<a href="https://github.com/join?source=login" target="_blank" rel="external">github</a> 按照其指定的流程注册一个属于你自己的独立github账号</p>
 <h1 id="二、在github上新建一个代码仓库"><a href="#二、在github上新建一个代码仓库" class="headerlink" title="二、在github上新建一个代码仓库"></a>二、在github上新建一个代码仓库</h1><p>按照github pages的说明，你需要在仓库中新建一个名字为&lt;账户名&gt;.github.io的名字的仓库<br>当访问&lt;账户名&gt;.github.io这个域名的时候，github会把&lt;账户名&gt;.github.io这个仓库下master<br>分支的代码作为你网站的源码</p>
@@ -42,9 +40,7 @@
     
     <summary type="html">
     
-      &lt;h4 id=&quot;导语&quot;&gt;&lt;a href=&quot;#导语&quot; class=&quot;headerlink&quot; title=&quot;导语:&quot;&gt;&lt;/a&gt;导语:&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;作为一名程序开发人员，拥有一个独立的个人博客系统是一个非常不错的选择，&lt;br&gt;通过博客系统我们不仅能够加深对知识的掌握，同时也还能帮助别人解决问题。&lt;br&gt;&lt;a href=&quot;https://hexo.io/zh-cn/&quot;&gt;hexo&lt;/a&gt;是一款快速、简介高效的博客框架，今天介绍一下&lt;br&gt;如何在github上搭建自己的个人博客系统&lt;/li&gt;
-&lt;/ul&gt;
+      &lt;p&gt;作为一名程序开发人员，拥有一个独立的个人博客系统是一个非常不错的选择，&lt;br&gt;通过博客系统我们不仅能够加深对知识的掌握，同时也还能帮助别人解决问题。&lt;br&gt;&lt;a href=&quot;https://hexo.io/zh-cn/&quot;&gt;hexo&lt;/a&gt;是一款快速、简介高效的博客框架，今天介绍一下&lt;br&gt;如何在github上搭建自己的个人博客系统&lt;/p&gt;
     
     </summary>
     
