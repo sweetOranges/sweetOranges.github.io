@@ -18,11 +18,9 @@
 	<ul>
 		<li>设置</li>
 		<li style="position: relative;">片段<div class="snippets"></div></li>
-		<li onclick="IDE.render_code()">代码</li>
-		<li onclick="IDE.render_table()">表格</li>
-		<li>图表</li>
-		<li onclick="IDE.load_data()">加载</li>
-		<li>运行</li>
+		<li onclick="ENV.render_code()">代码</li>
+		<li onclick="ENV.load_data()">加载</li>
+		<li onclick="ENV.run()">运行</li>
 	</ul>
 	
 </div>
@@ -40,7 +38,7 @@
 <script type="text/javascript" src="./js/app.js"></script>
 <script>
 	$(document).ready(function(){
-		IDE.init();
+		ENV.init();
 	});
 </script>
 </body>

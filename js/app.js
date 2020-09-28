@@ -1,5 +1,5 @@
 
-var IDE = (function(){
+var ENV = (function(){
 	var g_editer;
 	var g_worker;
 	var g_id = 0;
@@ -94,10 +94,24 @@ var IDE = (function(){
 		init_worker();
 		//init_gists();
 	}
+
+	function run() {
+        try {
+			var __code = g_editer.getValue();
+	        var code = `var main;${__code};if(main) {main(rows);}`;
+	        log('info', code)
+	        var compiler = new Function('rows', code);
+	        compiler(g_data);
+        } catch(e) {
+        	log('error', e)
+        }
+        
+	}
 	return {
 		init: init,
 		load_data: load_data,
 		render_table: render_table,
-		render_code: render_code
+		render_code: render_code,
+		run: run
 	}
 })();
