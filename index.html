@@ -1,1 +1,163 @@
-<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 甜橙的博客</title><meta name="description" content="分享技术是最大的快乐"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/favicon.jpg"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="甜橙的博客"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.jpg"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link active">博客</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/2936702734/" target="_blank" class="nav-list-link">微博</a></li><li class="nav-list-item"><a href="https://github.com/sweetOranges" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">订阅</a></li></ul></header><section class="container"><ul class="home post-list"><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/08/24/如何搭建hexo博客系统/" class="post-title-link">如何搭建hexo博客系统</a></h2><div class="post-info">2016年8月24日</div><div class="post-content"><p>作为一名程序开发人员，拥有一个独立的个人博客系统是一个非常不错的选择，通过博客系统我们不仅能够加深对知识的掌握，同时也还能帮助别人解决问题。<a href="https://hexo.io/zh-cn/">hexo</a>是一款快速、简介高效的博客框架，今天介绍一下如何在github上搭建自己的个人博客系统</p></div><a href="/2016/08/24/如何搭建hexo博客系统/" class="read-more">...阅读全文</a></article></li></ul></section><footer><div class="paginator"></div><div class="copyright"><p>© 2015 - 2016 <a href="http://yoursite.com">sweetOrange</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DV</title>
+	<style type="text/css">
+	html, body {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		margin: 0;
+		overflow: hidden;
+	}
+	#top-menu {
+		position: absolute;
+		height: 40px;
+		top: 0;
+		right: 0;
+        bottom: 100px;
+        left: 0;
+		border: 1px solid #333;
+		background: #000;
+		color: #fff;
+	}
+	#top-menu ul{
+		display: inline;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	#top-menu ul li {
+		display: inline-block;
+		line-height: 40px;
+		cursor: pointer;
+	}
+	#top-menu ul li:not(:first-child) {
+		margin-left: 10px;
+	}
+	#left-menu {
+		position: absolute;
+		top: 40px;
+		width: 150px;
+		height: 100%;
+        left: 0;
+        bottom: 0;
+        background: #191717;
+		color: #fff;
+	}
+
+	#left-menu ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	#left-menu ul li {
+		text-align: left;
+	}
+
+	#container {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	#console {
+		position: absolute;
+		height: 100px;
+		right: 0;
+        bottom: 0;
+        left: 150px;
+        overflow: scroll;
+	}
+
+	#container #dv-editor { 
+        position: absolute;
+        top: 40px;
+        right: 0;
+        bottom: 100px;
+        left: 150px;
+        overflow: scroll;
+    }
+    #container #view { 
+        position: absolute;
+        top: 40px;
+        left: 60%;
+        right: 0;
+        bottom: 100px;
+        overflow: scroll;
+        /*cursor: col-resize;*/
+    }
+
+     #container #view  #table{
+     	bottom: 0;
+     	max-height: 100%;
+     	overflow: scroll;
+     } 
+
+    table.hovertable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #999999;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    table.hovertable th {
+        background-color:#c3dde0;
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+    }
+    table.hovertable tr {
+        background-color:#d4e3e5;
+    }
+    table.hovertable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+    }
+	</style>
+	<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap-theme.min.css" rel="stylesheet">
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	<script src="https://gw.alipayobjects.com/os/lib/antv/g2/4.0.15/dist/g2.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/ace.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/worker-javascript.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/mode-javascript.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/theme-monokai.min.js"></script>
+</head>
+<body>
+<div id="top-menu">
+	<ul>
+		<li>设置</li>
+		<li>保存</li>
+		<li>片段</li>
+		<li>运行</li>
+	</ul>
+</div>
+<div id="container">
+	<div id="left-menu">
+		<ul></ul>
+	</div>
+	<div id="dv-editor">welcome</div>
+	<!-- <div id="view">
+		<table id="table" class="hovertable"></table>
+	</div> -->
+</div>
+<div id="console">
+	
+</div>
+<script type="text/javascript" src="./js/app.js"></script>
+<script>
+	$(document).ready(function(){
+		IDE.init();
+	});
+</script>
+</body>
+</html>
