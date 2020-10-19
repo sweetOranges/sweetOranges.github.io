@@ -5,6 +5,7 @@ var Context = {};
 var IDE = (function(context){
 
 	var g_editer;
+	var g_view;
 
 	ace.config.set('basePath', 'https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/');
 
@@ -14,15 +15,11 @@ var IDE = (function(context){
 		g_editer.setTheme("ace/theme/monokai");
 	    g_editer.session.setMode("ace/mode/javascript");
 	    g_editer.setFontSize(14);
-	    log('info', 'init_editer success');
 	}
 
-
-	function log(l, msg) {
-		$('#console').append(`<div><span style="color:${ l == 'info' ? '#00f': '#f00'}">${new Date}:</span> ${msg}</div>`);
-		$("#console").scrollTop = $("#console").scrollHeight;
+	function init_view() {
+		g_view = $('#view');
 	}
-
 
 
 	function render_code() {
@@ -37,10 +34,15 @@ var IDE = (function(context){
 
 	function init() {
 		init_editer();
+		init_view();
 	}
 
 	function get_editor() {
 		return g_editer;
+	}
+
+	function get_view() {
+		return g_view;
 	}
 
 	function run() {
@@ -50,15 +52,14 @@ var IDE = (function(context){
 	        var compiler = new Function('context', code);
 	        compiler(context);
         } catch(e) {
-        	console.log(e)
-        	log('error', e)
+        	console.error(e)
         }
         
 	}
 	return {
 		init: init,
-		log: log,
 		get_editor: get_editor,
+		get_view: get_view,
 		show_view: render_view,
 		show_code: render_code,
 		run: run
