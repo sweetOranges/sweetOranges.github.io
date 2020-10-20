@@ -15,6 +15,7 @@ Context.view = (function(ide, echarts){
     }
 
     function income_view(data, x, y) {
+        ide.show_view();
         var group = data.reduce(function(acc, item) {
             if (!acc[item[x]]) acc[item[x]] = [];
             acc[item[x]].push(item);
@@ -53,10 +54,10 @@ Context.view = (function(ide, echarts){
             series:[
             {'name': '收益率曲线', type: 'line', data: ys},
             {'name': '胜率曲线', type: 'line', data: sl},
-            {'name': '每日个数', type: 'bar', data: ds}]
+            {'name': '每日个数', type: 'line', data: ds}]
         });
+        console.log('echarts options', options)
         view.setOption(options);
-        ide.show_view();
     }
 
 
