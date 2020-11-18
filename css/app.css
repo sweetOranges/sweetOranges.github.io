@@ -17,10 +17,10 @@ height: 100%;
 position: absolute;
 padding-bottom: 20px;
 top: 0;
-bottom: 0;
+bottom: 50px;
 left: 0;
 right: 50%;
-overflow: scroll;
+overflow-y: scroll;
 }
 
 #container #right {
