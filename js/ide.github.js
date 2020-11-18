@@ -16,7 +16,7 @@ Context.github = (function(ide){
 
 	// list file by github api
 	async function list_file(path) {
-		let res = await ide.request({url: 'https://api.github.com/repos/sweetoranges/'+repos+'/contents/' + path,headers: headers});
+		let res = await ide.request({url: 'https://api.github.com/repos/sweetoranges/'+repos+'/contents/' + path,headers: headers})
 		let items = JSON.parse(res);
 		return items;
 	}

@@ -23,23 +23,29 @@ right: 50%;
 overflow: scroll;
 }
 
-#container #view {
+#container #right {
 position: absolute;
-top:0;
-right: 0;
-bottom: 400px;
+top: 0;
+bottom: 0;
 left: 50%;
+right: 0;
+}
+
+
+#container #right #view {
+position: relative;
+height: 60%;
+width: 100%;
+margin-top: 10px;
 overflow: scroll;
 }
 
-#container #console {
-position: absolute;
-left: 50%;
-bottom:50px;
-right: 0;
-height:300px;
-border-top: 1px solid #f00;
-overflow: scroll;
+#container #right #console {
+position: relative;
+margin-bottom: 20px;
+height: 30%;
+width: 100%;
+overflow-y: scroll;
 }
 
 

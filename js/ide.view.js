@@ -39,11 +39,12 @@ Context.view = (function(ide, echarts){
                 base_y_sum += item[y];
             }, 0);
             sl.push([x, base_win / (base_win + base_lose)]);
-            ys.push([x, base_y_sum]);
+            ys.push([x, (base_y_sum * 1.0).toFixed(2)]);
             ds.push([x, t]);
         });
         var view = echarts.init($('#view').get(0));
         var options = Object.assign({}, options, {
+            grid: {top: 50},
             legend: {data: ['收益率曲线', '胜率曲线', '每日个数']},
             tooltip: {trigger: 'axis', axisPointer: {type: 'cross'}},
             xAxis: {type: 'category', data: xs},
@@ -52,7 +53,7 @@ Context.view = (function(ide, echarts){
             series:[
             {'name': '收益率曲线', type: 'line', data: ys},
             {'name': '胜率曲线', type: 'line', data: sl},
-            {'name': '每日个数', type: 'line', data: ds}]
+            {'name': '每日个数', type: 'bar', data: ds}]
         });
         view.setOption(options);
         ide.log('income_view done!');
