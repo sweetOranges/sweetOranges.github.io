@@ -104,8 +104,8 @@ var IDE = (function(context){
 
 
 	function log(msg) {
-		var fmt = '<div>[' + new Date() + ']  ' + msg + "</div>";
-		$('#console').append(fmt);
+		var fmt = '[' + new Date() + ']  ' + msg;
+		console.log(fmt);
 
 	}
 

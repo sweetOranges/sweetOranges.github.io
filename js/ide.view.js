@@ -13,6 +13,8 @@ Context.view = (function(ide, echarts){
         $('#view').html(html);
     }
 
+    var echartsInstance = null;
+
     function income_view(data, x, y) {
         var group = data.reduce(function(acc, item) {
             if (!acc[item[x]]) acc[item[x]] = [];
@@ -42,7 +44,13 @@ Context.view = (function(ide, echarts){
             ys.push([x, (base_y_sum * 1.0).toFixed(2)]);
             ds.push([x, t]);
         });
-        var view = echarts.init($('#view').get(0));
+        // clean html first, then init echarts
+        $('#view').html('');
+        if (echartsInstance != null) {
+            echartsInstance.dispose();
+            echartsInstance = null;
+        }
+        echartsInstance = echarts.init($('#view').get(0));
         var options = Object.assign({}, options, {
             grid: {top: 50},
             legend: {data: ['收益率曲线', '胜率曲线', '每日个数']},
@@ -55,7 +63,7 @@ Context.view = (function(ide, echarts){
             {'name': '胜率曲线', type: 'line', data: sl},
             {'name': '每日个数', type: 'bar', data: ds}]
         });
-        view.setOption(options);
+        echartsInstance.setOption(options);
         ide.log('income_view done!');
     }
 

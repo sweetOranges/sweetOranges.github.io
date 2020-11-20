@@ -31,14 +31,16 @@
                         </li>
                         <li><a href="javascript:IDE.run();">Run</a></li>
                     </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="javascript:toggle()">折叠</a></li>
+                    </ul>
                 </div>
             </div>
         </nav>
         <div id="container">
-            <div id="editor"></div>
-            <div id="right">
+            <div class="left"><div id="editor"></div></div>
+            <div class="right">
                 <div id="view"></div>
-                <div id="console"></div>
             </div>
         </div>
         <script type="text/javascript" src="./js/ide.js"></script>
@@ -49,6 +51,17 @@
             $(document).ready(function() {
                 IDE.init();
             });
+            function toggle() {
+                let rw = $('#container .right').css('width');
+                if (rw == '0px') {
+                    $('#container .left').css('width', '60%');
+                    $('#container .right').css('width', '40%');
+                } else {
+                    $('#container .left').css('width', '100%');
+                    $('#container .right').css('width', '0px');
+                }
+                IDE.get_editor().resize();
+            }
         </script>
     </body>
 </html>
