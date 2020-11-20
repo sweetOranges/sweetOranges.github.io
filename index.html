@@ -12,6 +12,7 @@
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/worker-javascript.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/mode-javascript.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/theme-monokai.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/js-beautify/1.13.0/beautifier.min.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0px;border-radius: 0;">
@@ -29,6 +30,7 @@
                                 
                             </ul>
                         </li>
+                        <li><a href="javascript:fmtcode();">美化</a></li>
                         <li><a href="javascript:IDE.run();">Run</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
@@ -61,6 +63,9 @@
                     $('#container .right').css('width', '0px');
                 }
                 IDE.get_editor().resize();
+            }
+            function fmtcode() {
+                IDE.get_editor().setValue(beautifier.js(IDE.get_editor().getValue()))
             }
         </script>
     </body>
