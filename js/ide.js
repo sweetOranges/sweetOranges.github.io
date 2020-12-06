@@ -15,7 +15,6 @@ var IDE = (function(context){
 	    g_editer.session.setMode("ace/mode/javascript");
 	    g_editer.setFontSize(14);
 		g_worker.onmessage = onmessage;
-		log('init success');
 	}
 
 	function get_editor() {

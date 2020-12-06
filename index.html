@@ -2,12 +2,14 @@
 <html>
     <head>
         <title>数据可视化</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="./css/app.css" rel="stylesheet">
         <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.1.0/echarts.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/ace.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/worker-javascript.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/mode-javascript.min.js"></script>
@@ -33,17 +35,11 @@
                         <li><a href="javascript:fmtcode();">美化</a></li>
                         <li><a href="javascript:IDE.run();">Run</a></li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="javascript:toggle()">折叠</a></li>
-                    </ul>
                 </div>
             </div>
         </nav>
         <div id="container">
-            <div class="left"><div id="editor"></div></div>
-            <div class="right">
-                <div id="view"></div>
-            </div>
+           <div id="editor"></div>
         </div>
         <script type="text/javascript" src="./js/ide.js"></script>
         <script type="text/javascript" src="./js/ide.transform.js"></script>
@@ -53,17 +49,6 @@
             $(document).ready(function() {
                 IDE.init();
             });
-            function toggle() {
-                let rw = $('#container .right').css('width');
-                if (rw == '0px') {
-                    $('#container .left').css('width', '60%');
-                    $('#container .right').css('width', '40%');
-                } else {
-                    $('#container .left').css('width', '100%');
-                    $('#container .right').css('width', '0px');
-                }
-                IDE.get_editor().resize();
-            }
             function fmtcode() {
                 IDE.get_editor().setValue(beautifier.js(IDE.get_editor().getValue()))
             }

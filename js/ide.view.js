@@ -1,4 +1,4 @@
-Context.view = (function(ide, echarts){
+Context.view = (function(ide){
     function table(data) {
         var keys = Object.keys(data[0]);
         var thead = keys.map(function(key) {
@@ -10,10 +10,33 @@ Context.view = (function(ide, echarts){
                 }).join('') + "</tr>";
         }).join('');
         var html = `<table class="hovertable"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
-        $('#view').html(html);
+        var view = window.open('');
+        view.document.write(`<html><head><style>table.hovertable {
+font-family: verdana,arial,sans-serif;
+font-size:11px;
+color:#333333;
+border-width: 1px;
+border-color: #999999;
+border-collapse: collapse;
+width: 100%;
+}
+table.hovertable th {
+background-color:#c3dde0;
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #a9c6c9;
+}
+table.hovertable tr {
+background-color:#d4e3e5;
+}
+table.hovertable td {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #a9c6c9;
+}</style></head><body>${html}<body></html>`)
     }
-
-    var echartsInstance = null;
 
     function income_view(data, x, y) {
         var group = data.reduce(function(acc, item) {
@@ -45,12 +68,7 @@ Context.view = (function(ide, echarts){
             ds.push([x, t]);
         });
         // clean html first, then init echarts
-        $('#view').html('');
-        if (echartsInstance != null) {
-            echartsInstance.dispose();
-            echartsInstance = null;
-        }
-        echartsInstance = echarts.init($('#view').get(0));
+        var view = window.open('');
         var options = Object.assign({}, options, {
             grid: {top: 50},
             legend: {data: ['收益率曲线', '胜率曲线', '每日个数']},
@@ -63,13 +81,18 @@ Context.view = (function(ide, echarts){
             {'name': '胜率曲线', type: 'line', data: sl},
             {'name': '每日个数', type: 'bar', data: ds}]
         });
-        echartsInstance.setOption(options);
-        ide.log('income_view done!');
+        view.document.write(`<html><head>`)
+        view.document.write(`<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>`);
+        view.document.write(`<script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.1.0/echarts.min.js"></script>`)
+        view.document.write(`</head><body><div id="view" style="width:100%;height:500px;"></div>
+            <script>
+                var charts = echarts.init(document.getElementById('view'));
+                charts.setOption(${JSON.stringify(options)})
+            </script
+        </body></html>`);
     }
-
-
     return {
        table: table,
        income_view: income_view
     }
-})(IDE, echarts);
+})(IDE);

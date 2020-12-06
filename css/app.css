@@ -13,56 +13,13 @@ height: 100%;
 display: flex;
 }
 
-#container .left {
-height: 100%;
-width:60%;
-}
 
-#container .left #editor {
+
+#container  #editor {
 height: 100%;
 width: 100%
 }
 
-
-#container .right {
-height: 100%;
-width:  40%;
-display: flex;
-flex-direction: column;
-}
-
-#container .right #view {
-height: 100%;
-width: 100%;
-overflow: scroll;
-}
-
-
-table.hovertable {
-font-family: verdana,arial,sans-serif;
-font-size:11px;
-color:#333333;
-border-width: 1px;
-border-color: #999999;
-border-collapse: collapse;
-width: 100%;
-}
-table.hovertable th {
-background-color:#c3dde0;
-border-width: 1px;
-padding: 8px;
-border-style: solid;
-border-color: #a9c6c9;
-}
-table.hovertable tr {
-background-color:#d4e3e5;
-}
-table.hovertable td {
-border-width: 1px;
-padding: 8px;
-border-style: solid;
-border-color: #a9c6c9;
-}
 .dropdown-submenu {
 position: relative;
 }
