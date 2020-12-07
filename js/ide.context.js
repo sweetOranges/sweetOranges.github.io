@@ -148,7 +148,7 @@ border-color: #a9c6c9;
         view.document.write(`<html><head>`)
         view.document.write(`<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>`);
         view.document.write(`<script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.1.0/echarts.min.js"></script>`)
-        view.document.write(`</head><body><div id="view" style="width:100%;height:500px;"></div>
+        view.document.write(`</head><body><div id="view" style="width:${window.innerWidth}px;height:500px;"></div>
             <script>
                 var charts = echarts.init(document.getElementById('view'));
                 charts.setOption(${JSON.stringify(options)})
