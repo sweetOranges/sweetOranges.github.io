@@ -48,6 +48,8 @@
         <script>
             $(document).ready(function() {
                 IDE.init();
+		var code = window.localStorage.getItem('code');
+		if (!code) {return;}
                 IDE.get_editor().setValue(window.localStorage.getItem('code'));
             });
             function fmt_code() {
