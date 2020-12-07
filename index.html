@@ -9,6 +9,7 @@
         <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="./css/app.css" rel="stylesheet">
         <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/ace.min.js"></script>
         <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/worker-javascript.js"></script>
@@ -32,7 +33,8 @@
                                 
                             </ul>
                         </li>
-                        <li><a href="javascript:fmtcode();">美化</a></li>
+                        <li><a href="javascript:fmt_code();">美化</a></li>
+                        <li><a href="javascript:save_code();">保存</a></li>
                         <li><a href="javascript:IDE.run();">Run</a></li>
                     </ul>
                 </div>
@@ -42,15 +44,17 @@
            <div id="editor"></div>
         </div>
         <script type="text/javascript" src="./js/ide.js"></script>
-        <script type="text/javascript" src="./js/ide.transform.js"></script>
-        <script type="text/javascript" src="./js/ide.view.js"></script>
-         <script type="text/javascript" src="./js/ide.github.js"></script>
+         <script type="text/javascript" src="./js/ide.context.js"></script>
         <script>
             $(document).ready(function() {
                 IDE.init();
+                IDE.get_editor().setValue(window.localStorage.getItem('code'));
             });
-            function fmtcode() {
+            function fmt_code() {
                 IDE.get_editor().setValue(beautifier.js(IDE.get_editor().getValue()))
+            }
+            function save_code(){
+                window.localStorage.setItem('code', IDE.get_editor().getValue());
             }
         </script>
     </body>

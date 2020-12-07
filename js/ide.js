@@ -15,6 +15,8 @@ var IDE = (function(context){
 	    g_editer.session.setMode("ace/mode/javascript");
 	    g_editer.setFontSize(14);
 		g_worker.onmessage = onmessage;
+		new VConsole();
+		console.log('ide: init finished');
 	}
 
 	function get_editor() {
@@ -24,22 +26,22 @@ var IDE = (function(context){
 	function onmessage(e) {
 		let resp = e.data;
 		if (!resp.type) {
-			log('type not in resp');
+			console.log('ide: type not in resp');
 			return;
 		}
 		if (resp.type == 'log') {
-			log(resp.data);
+			console.log(resp.data);
 			return;
 		}
 		if (!resp.id) {
-			log('id not in resp');
+			console.log('ide: id not in resp');
 			return;
 		}
 		if (!g_task.has(resp.id)) {
-			log('g_task not has task_id:' + resp.id);
+			console.log('ide: g_task not has task_id:' + resp.id);
 			return;
 		}
-		log('onmessage, id=' + resp.id);
+		console.log('onmessage, id=' + resp.id);
 		let cb = g_task.get(resp.id);
 		if (resp.type == 'error') {
 			cb.reject(resp.data);
@@ -49,24 +51,33 @@ var IDE = (function(context){
 		g_task.delete(resp.id);
 	}
 
-	function post(method, args) {
-		return new Promise(function(resolve, reject) {
-			let id = g_id++;
-			let task = {method: method, args: args, id: id};
-			g_worker.postMessage(task);
-			log('post, method=' + method + ",id=" + id);
-			g_task.set(id, {resolve: resolve, reject: reject});
-		});
-	}
-
 	function async(main, deps, args) {
 		let code = `var main=(${main.toString()});`;
 		let dep_code = deps.map((item) => {
 			return item.toString() + "\n";
 		});
 		code += dep_code.join('');
-		return post('async', [code, args]);
+		return new Promise(function(resolve, reject) {
+			let id = g_id++;
+			let task = {method: 'async', args: [code, args], id: id};
+			g_worker.postMessage(task);
+			console.log('ide: async task submit, method=async', {method: 'async', id: id});
+			g_task.set(id, {resolve: resolve, reject: reject});
+		});
 	}
+
+	function pify(task, resolveName, rejectName) {
+        return new Promise(function(resolve, reject) {
+            var request = task(resolve, reject);
+            if (Array.isArray(resolveName)) {
+                resolveName.forEach(function(name) {request[name] = resolve;});
+            }
+            if (Array.isArray(rejectName)) {
+                rejectName.forEach(function(name) {request[name] = reject;});
+            }
+        });
+    }
+
 
 	function run() {
         try {
@@ -101,21 +112,12 @@ var IDE = (function(context){
 	  });
 	}
 
-
-	function log(msg) {
-		var fmt = '[' + new Date() + ']  ' + msg;
-		console.log(fmt);
-
-	}
-
-	Context.network = {request: request};
-	Context.async = async;
+	Context.util = {async:async, pify: pify, request: request};
 
 	return {
-		log: log,
 		init: init,
 		run: run,
-		post: post,
+		pify: pify,
 		request: request,
 		get_editor: get_editor
 	}

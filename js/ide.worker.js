@@ -1,8 +1,9 @@
 function async(code, args) {
-  console.log(this)
   var code = `${code};if(main) { return main(args);}`;
+  console.log('worker: start exec code', code);
   postMessage({type: 'log', data: "aysnc task start!"});
   var compiler = new Function('args', code);
+  console.log('worker: finish job');
   postMessage({type: 'log', data: "aysnc task done!"});
   return compiler(args);
 }
