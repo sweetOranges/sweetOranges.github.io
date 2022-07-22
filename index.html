@@ -55,6 +55,7 @@
     <div id="view-container">
       <div class="view-tool">
         <a href="javascript:void(0)" onclick="edit()">编辑</a>
+        <a href="javascript:void(0)" onclick="add()">新建</a>
         <a href="javascript:void(0)" onclick="save()">保存</a>
       </div>
       <div class="view-content">welcome</div>
@@ -64,8 +65,7 @@
     var Base64 = {
 
       // private property
-      _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-      // public method for encoding
+      _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="// public method for encoding
       ,
       encode: function(input) {
         var output = "";
@@ -251,24 +251,38 @@
       ele.innerHTML += html.join('');
     }
 
-    function preview_content(ele) {
+    function preview_content(ele, is_edit) {
       let text = ele.value;
-      render_view(document.getElementById('preview-container'), document.body.dataset.path, text);
+      let path = is_edit ? document.body.dataset.path : document.getElementById('filename').value;
+      render_view(document.getElementById('preview-container'), path, text);
+    }
+
+    function add() {
+      document.body.dataset.sha = '';
+      viewContainer.innerHTML = `<input id="filename" type="text" style="margin:5px;width:500px;">
+         <textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this, false)"></textarea>
+        <div id="preview-container"></div>
+        `;
     }
 
     async function save() {
       let sha = document.body.dataset.sha;
       let path = document.body.dataset.path;
       let content = document.getElementById('editor').value;
+      let body = {
+        message: 'commit by webpage',
+        content: Base64.encode(content)
+      };
+      if (sha == '') {
+        path = document.getElementById('filename').value;
+      } else {
+        body.sha = sha
+      }
       let res = await request({
         method: 'PUT',
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/contents/" + path,
         headers: headers,
-        body: JSON.stringify({
-          message: 'commit by webpage',
-          content: Base64.encode(content),
-          sha: sha
-        })
+        body: JSON.stringify(body)
       });
       alert('save success ' + res.commit.message);
     }
@@ -280,7 +294,7 @@
         headers: headers
       });
       let text = Base64.decode(res.content);
-      viewContainer.innerHTML = `<textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this)">${text}</textarea>
+      viewContainer.innerHTML = `<textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this, true)">${text}</textarea>
         <div id="preview-container"></div>
         `;
       render_view(document.getElementById('preview-container'), document.body.dataset.path, text);
