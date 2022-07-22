@@ -217,16 +217,18 @@
       );
     }
 
+    const url = new URL(window.location.href);
+
     function get_token() {
       return window.localStorage.getItem('github-token');
     }
 
     function get_user() {
-      return window.localStorage.getItem('github-user') ? window.localStorage.getItem('github-user') : 'sweetoranges';
+      return url.searchParams.get("user");
     }
 
     function get_repos() {
-      return window.localStorage.getItem('github-repos');
+      return url.searchParams.get("repos");;
     }
 
     let headers = {
