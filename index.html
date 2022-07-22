@@ -1,63 +1,339 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>数据可视化</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
-        <link href="./css/app.css" rel="stylesheet">
-        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/ace.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/worker-javascript.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/mode-javascript.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/ace/1.4.9/theme-monokai.min.js"></script>
-        <script src="https://cdn.bootcdn.net/ajax/libs/js-beautify/1.13.0/beautifier.min.js"></script>
-    </head>
-    <body>
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0px;border-radius: 0;">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#">
-                        IDE  <span class="glyphicon glyphicon-console"></span>
-                    </a>
-                </div>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">项目 <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu" id="nav-project">
-                                
-                            </ul>
-                        </li>
-                        <li><a href="javascript:fmt_code();">美化</a></li>
-                        <li><a href="javascript:save_code();">保存</a></li>
-                        <li><a href="javascript:IDE.run();">Run</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <div id="container">
-           <div id="editor"></div>
-        </div>
-        <script type="text/javascript" src="./js/ide.js"></script>
-         <script type="text/javascript" src="./js/ide.context.js"></script>
-        <script>
-            $(document).ready(function() {
-                IDE.init();
-		var code = window.localStorage.getItem('code');
-		if (!code) {return;}
-                IDE.get_editor().setValue(window.localStorage.getItem('code'));
-            });
-            function fmt_code() {
-                IDE.get_editor().setValue(beautifier.js(IDE.get_editor().getValue()))
-            }
-            function save_code(){
-                window.localStorage.setItem('code', IDE.get_editor().getValue());
-            }
-        </script>
-    </body>
+  <head>
+    <title>数据可视化</title>
+    <meta charset="utf8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.bootcdn.net/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <style type="text/css">
+      body {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      #menu-tree {
+        position: absolute;
+        height: 100%;
+        width: 200px;
+        top: 0;
+        bottom: 0;
+        border-right: 1px solid #444;
+      }
+
+      #menu-tree .menu-item {
+        padding: 5px;
+        margin: 5px 0;
+        cursor: pointer;
+      }
+
+      #menu-tree .active {
+        color: red;
+      }
+
+      #view-container {
+        position: absolute;
+        height: 100vh;
+        overflow: scroll;
+        top: 0;
+        width: 100%;
+        left: 200px;
+        bottom: 0;
+        padding: 10px ;
+        border-left: 1px solid gray;
+      }
+
+      #preview-container {
+        margin: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="menu-tree"></div>
+    <div id="view-container">
+      <div class="view-tool">
+        <a href="javascript:void(0)" onclick="edit()">编辑</a>
+        <a href="javascript:void(0)" onclick="save()">保存</a>
+      </div>
+      <div class="view-content">welcome</div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    var Base64 = {
+
+      // private property
+      _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+      // public method for encoding
+      ,
+      encode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = Base64._utf8_encode(input);
+
+        while (i < input.length) {
+          chr1 = input.charCodeAt(i++);
+          chr2 = input.charCodeAt(i++);
+          chr3 = input.charCodeAt(i++);
+
+          enc1 = chr1 >> 2;
+          enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+          enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+          enc4 = chr3 & 63;
+
+          if (isNaN(chr2)) {
+            enc3 = enc4 = 64;
+          } else if (isNaN(chr3)) {
+            enc4 = 64;
+          }
+
+          output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+        }
+        // Whend 
+
+        return output;
+      }// End Function encode 
+
+      // public method for decoding
+      ,
+      decode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (i < input.length) {
+          enc1 = this._keyStr.indexOf(input.charAt(i++));
+          enc2 = this._keyStr.indexOf(input.charAt(i++));
+          enc3 = this._keyStr.indexOf(input.charAt(i++));
+          enc4 = this._keyStr.indexOf(input.charAt(i++));
+
+          chr1 = (enc1 << 2) | (enc2 >> 4);
+          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+          chr3 = ((enc3 & 3) << 6) | enc4;
+
+          output = output + String.fromCharCode(chr1);
+
+          if (enc3 != 64) {
+            output = output + String.fromCharCode(chr2);
+          }
+
+          if (enc4 != 64) {
+            output = output + String.fromCharCode(chr3);
+          }
+
+        }
+        // Whend 
+
+        output = Base64._utf8_decode(output);
+
+        return output;
+      }// End Function decode 
+
+      // private method for UTF-8 encoding
+      ,
+      _utf8_encode: function(string) {
+        var utftext = "";
+        string = string.replace(/\r\n/g, "\n");
+
+        for (var n = 0; n < string.length; n++) {
+          var c = string.charCodeAt(n);
+
+          if (c < 128) {
+            utftext += String.fromCharCode(c);
+          } else if ((c > 127) && (c < 2048)) {
+            utftext += String.fromCharCode((c >> 6) | 192);
+            utftext += String.fromCharCode((c & 63) | 128);
+          } else {
+            utftext += String.fromCharCode((c >> 12) | 224);
+            utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+            utftext += String.fromCharCode((c & 63) | 128);
+          }
+
+        }
+        // Next n 
+
+        return utftext;
+      }// End Function _utf8_encode 
+
+      // private method for UTF-8 decoding
+      ,
+      _utf8_decode: function(utftext) {
+        var string = "";
+        var i = 0;
+        var c, c1, c2, c3;
+        c = c1 = c2 = 0;
+
+        while (i < utftext.length) {
+          c = utftext.charCodeAt(i);
+
+          if (c < 128) {
+            string += String.fromCharCode(c);
+            i++;
+          } else if ((c > 191) && (c < 224)) {
+            c2 = utftext.charCodeAt(i + 1);
+            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+            i += 2;
+          } else {
+            c2 = utftext.charCodeAt(i + 1);
+            c3 = utftext.charCodeAt(i + 2);
+            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+          }
+
+        }
+        // Whend 
+
+        return string;
+      }// End Function _utf8_decode 
+
+    }
+    let viewContainer = document.querySelector('#view-container .view-content');
+    function request(obj, json=true) {
+      return new Promise((resolve,reject)=>{
+        let xhr = new XMLHttpRequest();
+        xhr.open(obj.method || "GET", obj.url);
+        if (obj.headers) {
+          Object.keys(obj.headers).forEach(key=>{
+            xhr.setRequestHeader(key, obj.headers[key]);
+          }
+          );
+        }
+        xhr.onload = ()=>{
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(json ? JSON.parse(xhr.response) : xhr.response);
+          } else {
+            reject(xhr.statusText);
+          }
+        }
+        ;
+        xhr.onerror = ()=>reject(xhr.statusText);
+        xhr.send(obj.body);
+      }
+      );
+    }
+
+    function get_token() {
+      return window.localStorage.getItem('github-token');
+    }
+
+    function get_user() {
+      return window.localStorage.getItem('github-user') ? window.localStorage.getItem('github-user') : 'sweetoranges';
+    }
+
+    function get_repos() {
+      return window.localStorage.getItem('github-repos');
+    }
+
+    let headers = {
+      "Authorization": "Basic " + btoa("token:" + get_token())
+    };
+    let user = get_user();
+    let repos = get_repos();
+    async function render_menu(ele, path) {
+      let list = await request({
+        url: 'https://api.github.com/repos/' + user + '/' + repos + '/contents/' + path,
+        headers: headers
+      })
+      let html = [];
+      list.forEach(item=>{
+        html.push(`<div class="menu-item" 
+                data-type="${item.type}" 
+                data-path="${item.path}" 
+                data-sha="${item.sha}" 
+                onclick="view(this)">${item.name}</div>`)
+      }
+      );
+      ele.innerHTML += html.join('');
+    }
+
+    function preview_content(ele) {
+      let text = ele.value;
+      render_view(document.getElementById('preview-container'), document.body.dataset.path, text);
+    }
+
+    async function save() {
+      let sha = document.body.dataset.sha;
+      let path = document.body.dataset.path;
+      let content = document.getElementById('editor').value;
+      let res = await request({
+        method: 'PUT',
+        url: 'https://api.github.com/repos/' + user + '/' + repos + "/contents/" + path,
+        headers: headers,
+        body: JSON.stringify({
+          message: 'commit by webpage',
+          content: Base64.encode(content),
+          sha: sha
+        })
+      });
+      alert('save success ' + res.commit.message);
+    }
+
+    async function edit() {
+      let sha = document.body.dataset.sha;
+      let res = await request({
+        url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + sha,
+        headers: headers
+      });
+      let text = Base64.decode(res.content);
+      viewContainer.innerHTML = `<textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this)">${text}</textarea>
+        <div id="preview-container"></div>
+        `;
+      render_view(document.getElementById('preview-container'), document.body.dataset.path, text);
+    }
+
+    function render_view(container, path, text) {
+      let pos = path.lastIndexOf('.');
+      let ext = '';
+      if (pos != -1) {
+        ext = path.substr(pos);
+      }
+      if (ext == '.md') {
+        container.innerHTML = markdownit().render(text)
+      } else {
+        let temp = document.createElement("div");
+        temp.innerText = text;
+        container.innerHTML = `<pre>${temp.innerHTML}</pre>`;
+      }
+    }
+
+    async function view(ele) {
+      let dataset = ele.dataset;
+      if (dataset.type == 'dir') {
+        if (dataset.load) {
+          let subele = ele.querySelector('.sub-menu-item');
+          subele.style.display = subele.style.display == 'none' ? 'block' : 'none';
+        } else {
+          ele.innerHTML += '<div class="sub-menu-item"></div>';
+          render_menu(ele.querySelector('.sub-menu-item'), dataset.path)
+          ele.dataset.load = true;
+        }
+        return;
+      }
+      let res = await request({
+        url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
+        headers: headers
+      });
+      let text = Base64.decode(res.content);
+      render_view(viewContainer, dataset.path, text);
+      document.querySelectorAll('.menu-item').forEach(item=>{
+        item.className = 'menu-item';
+      }
+      );
+      ele.className = 'menu-item active';
+      document.body.dataset.sha = dataset.sha;
+      document.body.dataset.path = dataset.path;
+      viewContainer.scrollTop = 0;
+    }
+
+    function init() {
+      render_menu(document.getElementById('menu-tree'), '');
+    }
+
+    init();
+  </script>
 </html>
