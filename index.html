@@ -6,59 +6,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdn.bootcdn.net/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
     <style type="text/css">
       body {
         position: relative;
         height: 100%;
         width: 100%;
-        overflow: hidden;
+        padding: 0;
+        margin: 0;
       }
 
       #menu-tree {
         position: absolute;
-        height: 100%;
-        width: 200px;
-        top: 0;
+        width: 300px;
+        left: 0;
         bottom: 0;
-        border-right: 1px solid #444;
-      }
-
-      #menu-tree .menu-item {
-        padding: 5px;
-        margin: 5px 0;
-        cursor: pointer;
-      }
-
-      #menu-tree .active {
-        color: red;
+        top: 0;
+        height: 100vh;
+        overflow-x: hidden;
+        overflow-y: scroll;
       }
 
       #view-container {
-        position: absolute;
-        height: 100vh;
         overflow: scroll;
-        top: 0;
-        width: 100%;
-        left: 200px;
+        position: absolute;
+        left: 300px;
+        height: 100vh;
         bottom: 0;
-        padding: 10px ;
+        right: 0;
+        top: 0;
+        padding: 10px;
         border-left: 1px solid gray;
       }
 
-      #preview-container {
-        margin: 0 10px;
+      #view-content {
+        top: 80px;
+        z-index: 0;
+        opacity: 1;
+        position: absolute;
+      }
+
+      #editor-content {
+        z-index: -1;
+        opacity: 0;
+        width: 100%;
+        overflow: hidden;
+        bottom: 0;
+        right: 0;
+        top: 80px;
+        position: absolute;
+      }
+
+      .tree summary {
+        outline: 0;
+        padding-left: 20px;
+        list-style: none;
+      }
+
+      .tree summary:not(:only-child) {
+        background: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.354 2.646A.5.5 0 0 0 4.5 3v6a.5.5 0 0 0 .854.354l3-3a.5.5 0 0 0 0-.708l-3-3z' fill='%23000' fill-opacity='.45'/%3E%3C/svg%3E") 4px center no-repeat;
+      }
+
+      .tree details {
+        padding-left: 10px
+      }
+
+      .tree-item {
+        display: flex;
+        align-items: center;
+        height: 46px;
+        font-size: 15px;
+        line-height: 22px;
+        color: rgba(0, 0, 0, 0.85);
+        padding-left: 400px;
+        margin-left: -400px;
+        cursor: default;
+      }
+
+      .tree-item::after {
+        content: '';
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        height: 38px;
+        background: #EEF2FF;
+        border-radius: 8px;
+        z-index: -1;
+        opacity: 0;
+        transition: .2s;
+      }
+
+      .tree-item:hover::after {
+        opacity: 1;
       }
     </style>
   </head>
   <body>
-    <div id="menu-tree"></div>
+    <div id="menu-tree" class="tree"></div>
     <div id="view-container">
       <div class="view-tool">
+        <a href="javascript:void(0)" onclick="view()">查看</a>
         <a href="javascript:void(0)" onclick="edit()">编辑</a>
-        <a href="javascript:void(0)" onclick="add()">新建</a>
         <a href="javascript:void(0)" onclick="save()">保存</a>
+        <a href="javascript:void(0)" onclick="add()">新建</a>
       </div>
-      <div class="view-content">welcome</div>
+      <div id="view-content">welcome</div>
+      <div id="editor-content"></div>
     </div>
   </body>
   <script type="text/javascript">
@@ -192,7 +245,19 @@
       }// End Function _utf8_decode 
 
     }
-    let viewContainer = document.querySelector('#view-container .view-content');
+    let viewContainer = document.querySelector('#view-content');
+    let editContainer = document.querySelector('#editor-content');
+    let geditor;
+    require.config({
+      paths: {
+        'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
+      }
+    });
+    require(['vs/editor/editor.main'], ()=>{
+      geditor = monaco.editor.create(editContainer)
+    }
+    );
+
     function request(obj, json=true) {
       return new Promise((resolve,reject)=>{
         let xhr = new XMLHttpRequest();
@@ -228,7 +293,8 @@
     }
 
     function get_repos() {
-      return url.searchParams.get("repos");;
+      return url.searchParams.get("repos");
+      ;
     }
 
     let headers = {
@@ -236,50 +302,61 @@
     };
     let user = get_user();
     let repos = get_repos();
-    async function render_menu(ele, path) {
-      let list = await request({
-        url: 'https://api.github.com/repos/' + user + '/' + repos + '/contents/' + path,
-        headers: headers
-      })
+    async function render_menu() {
       let html = [];
-      list.forEach(item=>{
-        html.push(`<div class="menu-item" 
+      let fn = async(path)=>{
+        let list = await request({
+          url: 'https://api.github.com/repos/' + user + '/' + repos + '/contents/' + path,
+          headers: headers
+        })
+        for (let i = 0; i < list.length; i++) {
+          let item = list[i];
+
+          html.push(`<details  
                 data-type="${item.type}" 
                 data-path="${item.path}" 
-                data-sha="${item.sha}" 
-                onclick="view(this)">${item.name}</div>`)
+                data-sha="${item.sha}"  
+                onclick="load(this)"><summary><span class="tree-item">${item.name}</span></summary>`)
+          if (item.type == 'dir') {
+            await fn(item.path);
+          }
+          html.push('</details>')
+        }
       }
-      );
-      ele.innerHTML += html.join('');
+      ;
+      await fn('');
+      document.getElementById('menu-tree').innerHTML = html.join('');
     }
 
-    function preview_content(ele, is_edit) {
-      let text = ele.value;
-      let path = is_edit ? document.body.dataset.path : document.getElementById('filename').value;
-      render_view(document.getElementById('preview-container'), path, text);
-    }
-
-    function add() {
+    async function add() {
+      let path = prompt('请输入路径名').trim();
+      if (path.length == 0) {
+        alert('路径名不能为空');
+        return;
+      }
+      let body = {
+        message: 'commit by webpage',
+        content: ''
+      };
+      let res = await request({
+        method: 'PUT',
+        url: 'https://api.github.com/repos/' + user + '/' + repos + "/contents/" + path,
+        headers: headers,
+        body: JSON.stringify(body)
+      });
       document.body.dataset.sha = '';
-      viewContainer.innerHTML = `<input id="filename" type="text" style="margin:5px;width:500px;">
-         <textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this, false)"></textarea>
-        <div id="preview-container"></div>
-        `;
+      alert('save success ' + res.commit.message);
     }
 
     async function save() {
       let sha = document.body.dataset.sha;
       let path = document.body.dataset.path;
-      let content = document.getElementById('editor').value;
+      let content = geditor.getValue();
       let body = {
         message: 'commit by webpage',
-        content: Base64.encode(content)
+        content: Base64.encode(content),
+        sha: sha
       };
-      if (sha == '') {
-        path = document.getElementById('filename').value;
-      } else {
-        body.sha = sha
-      }
       let res = await request({
         method: 'PUT',
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/contents/" + path,
@@ -290,64 +367,54 @@
     }
 
     async function edit() {
-      let sha = document.body.dataset.sha;
-      let res = await request({
-        url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + sha,
-        headers: headers
-      });
-      let text = Base64.decode(res.content);
-      viewContainer.innerHTML = `<textarea rows="50" style="width:100%;" id="editor" onchange="preview_content(this, true)">${text}</textarea>
-        <div id="preview-container"></div>
-        `;
-      render_view(document.getElementById('preview-container'), document.body.dataset.path, text);
+      viewContainer.style.opacity = 0;
+      viewContainer.style.zIndex = -1;
+      editContainer.style.opacity = 1;
+      editContainer.style.zIndex = 0;
+      geditor.setValue(cacheContainer.value);
     }
 
-    function render_view(container, path, text) {
+    function view() {
+      viewContainer.style.opacity = 1;
+      viewContainer.style.zIndex = 0;
+      editContainer.style.opacity = 0;
+      editContainer.style.zIndex = -1;
+      let path = document.body.dataset.path;
+      let text = geditor.getValue();
       let pos = path.lastIndexOf('.');
       let ext = '';
       if (pos != -1) {
         ext = path.substr(pos);
       }
       if (ext == '.md') {
-        container.innerHTML = markdownit().render(text)
+        viewContainer.innerHTML = markdownit().render(text)
       } else {
         let temp = document.createElement("div");
         temp.innerText = text;
-        container.innerHTML = `<pre>${temp.innerHTML}</pre>`;
+        viewContainer.innerHTML = `<pre>${temp.innerHTML}</pre>`;
       }
+      viewContainer.scrollTop = 0;
     }
 
-    async function view(ele) {
+    async function load(ele) {
+      viewContainer.style.opacity = 1;
+      viewContainer.style.zIndex = 0;
+      editContainer.style.opacity = 0;
+      editContainer.style.zIndex = -1;
       let dataset = ele.dataset;
-      if (dataset.type == 'dir') {
-        if (dataset.load) {
-          let subele = ele.querySelector('.sub-menu-item');
-          subele.style.display = subele.style.display == 'none' ? 'block' : 'none';
-        } else {
-          ele.innerHTML += '<div class="sub-menu-item"></div>';
-          render_menu(ele.querySelector('.sub-menu-item'), dataset.path)
-          ele.dataset.load = true;
-        }
-        return;
-      }
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
         headers: headers
       });
       let text = Base64.decode(res.content);
-      render_view(viewContainer, dataset.path, text);
-      document.querySelectorAll('.menu-item').forEach(item=>{
-        item.className = 'menu-item';
-      }
-      );
-      ele.className = 'menu-item active';
+      geditor.setValue(text);
       document.body.dataset.sha = dataset.sha;
       document.body.dataset.path = dataset.path;
-      viewContainer.scrollTop = 0;
+      view();
     }
 
     function init() {
-      render_menu(document.getElementById('menu-tree'), '');
+      render_menu();
     }
 
     init();
