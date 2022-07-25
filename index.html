@@ -332,7 +332,11 @@
     }
 
     async function add() {
-      let path = prompt('请输入路径名').trim();
+      let path = prompt('请输入路径名');
+      if (path === null) {
+        return;
+      }
+      path = path.trim();
       if (path.length == 0) {
         alert('路径名不能为空');
         return;
