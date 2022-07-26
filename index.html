@@ -378,7 +378,6 @@
       viewContainer.style.zIndex = -1;
       editContainer.style.opacity = 1;
       editContainer.style.zIndex = 0;
-      geditor.setValue(cacheContainer.value);
     }
 
     function view() {
@@ -404,10 +403,6 @@
     }
 
     async function load(ele) {
-      viewContainer.style.opacity = 1;
-      viewContainer.style.zIndex = 0;
-      editContainer.style.opacity = 0;
-      editContainer.style.zIndex = -1;
       let dataset = ele.dataset;
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
