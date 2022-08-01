@@ -5,7 +5,7 @@
     <meta charset="utf8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.bootcdn.net/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css" rel="stylesheet">
     <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
     <style type="text/css">
       body {
@@ -35,7 +35,7 @@
         bottom: 0;
         right: 0;
         top: 0;
-        padding: 10px;
+        padding: 10px 20px;
         border-left: 1px solid gray;
       }
 
@@ -99,6 +99,9 @@
       .tree-item:hover::after {
         opacity: 1;
       }
+      #message {
+        color: red;
+      }
     </style>
   </head>
   <body>
@@ -109,8 +112,9 @@
         <a href="javascript:void(0)" onclick="edit()">编辑</a>
         <a href="javascript:void(0)" onclick="save()">保存</a>
         <a href="javascript:void(0)" onclick="add()">新建</a>
+        <span id="message"></span>
       </div>
-      <div id="view-content">welcome</div>
+      <div id="view-content" class="markdown-body">welcome</div>
       <div id="editor-content"></div>
     </div>
   </body>
@@ -249,6 +253,7 @@
     let editContainer = document.querySelector('#editor-content');
     let geditor;
     let menuContainer = document.getElementById('menu-tree');
+    let messageContainer = document.getElementById('message');
     require.config({
       paths: {
         'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
@@ -260,6 +265,7 @@
     );
 
     function request(obj, json=true) {
+      messageContainer.innerHTML = `start request ${obj.url} ...`;
       return new Promise((resolve,reject)=>{
         let xhr = new XMLHttpRequest();
         xhr.open(obj.method || "GET", obj.url);
@@ -271,8 +277,10 @@
         }
         xhr.onload = ()=>{
           if (xhr.status >= 200 && xhr.status < 300) {
+            messageContainer.innerHTML = `finished request ${obj.url}`;
             resolve(json ? JSON.parse(xhr.response) : xhr.response);
           } else {
+            messageContainer.innerHTML = `error request ${obj.url}`;
             reject(xhr.statusText);
           }
         }
@@ -381,7 +389,19 @@
       geditor.setValue(cacheContainer.value);
     }
 
-    function view() {
+    async function markdown(text) {
+      let res = await request({
+        url: 'https://api.github.com/markdown',
+        headers,
+        method: 'POST',
+        body: JSON.stringify({
+          text: text
+        })
+      }, false)
+      return res;
+    }
+
+    async function view() {
       viewContainer.style.opacity = 1;
       viewContainer.style.zIndex = 0;
       editContainer.style.opacity = 0;
@@ -394,7 +414,8 @@
         ext = path.substr(pos);
       }
       if (ext == '.md') {
-        viewContainer.innerHTML = markdownit().render(text)
+        let raw = await markdown(text)
+        viewContainer.innerHTML = raw;
       } else {
         let temp = document.createElement("div");
         temp.innerText = text;
