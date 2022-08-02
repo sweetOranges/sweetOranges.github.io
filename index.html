@@ -99,9 +99,6 @@
       .tree-item:hover::after {
         opacity: 1;
       }
-      #message {
-        color: red;
-      }
     </style>
   </head>
   <body>
@@ -265,7 +262,8 @@
     );
 
     function request(obj, json=true) {
-      messageContainer.innerHTML = `start request ${obj.url} ...`;
+      messageContainer.innerHTML = `${obj.url} ...`;
+      messageContainer.style.color = 'black';
       return new Promise((resolve,reject)=>{
         let xhr = new XMLHttpRequest();
         xhr.open(obj.method || "GET", obj.url);
@@ -277,10 +275,12 @@
         }
         xhr.onload = ()=>{
           if (xhr.status >= 200 && xhr.status < 300) {
-            messageContainer.innerHTML = `finished request ${obj.url}`;
+            messageContainer.innerHTML = `${obj.url}`;
+            messageContainer.style.color = 'green';
             resolve(json ? JSON.parse(xhr.response) : xhr.response);
           } else {
-            messageContainer.innerHTML = `error request ${obj.url}`;
+            messageContainer.innerHTML = `${obj.url}`;
+            messageContainer.style.color = 'red';
             reject(xhr.statusText);
           }
         }
@@ -425,6 +425,7 @@
 
     async function load(ele) {
       let dataset = ele.dataset;
+      if (dataset.type == 'dir') return;
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
         headers: headers
