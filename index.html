@@ -5,8 +5,10 @@
     <meta charset="utf8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script> -->
     <style type="text/css">
       body {
         position: relative;
@@ -35,26 +37,6 @@
         bottom: 0;
         right: 0;
         top: 0;
-        padding: 0px 20px 0px 20px;
-        border-left: 1px solid gray;
-      }
-
-      #view-content {
-        top: 80px;
-        z-index: 0;
-        opacity: 1;
-        position: absolute;
-      }
-
-      #editor-content {
-        z-index: -1;
-        opacity: 0;
-        width: 100%;
-        overflow: hidden;
-        bottom: 0;
-        right: 0;
-        top: 80px;
-        position: absolute;
       }
 
       .tree summary {
@@ -104,15 +86,7 @@
   <body>
     <div id="menu-tree" class="tree"></div>
     <div id="view-container">
-      <div class="view-tool">
-        <a href="javascript:void(0)" onclick="view()">查看</a>
-        <a href="javascript:void(0)" onclick="edit()">编辑</a>
-        <a href="javascript:void(0)" onclick="save()">保存</a>
-        <a href="javascript:void(0)" onclick="add()">新建</a>
-        <span id="message"></span>
-      </div>
-      <div id="view-content" class="markdown-body">welcome</div>
-      <div id="editor-content"></div>
+      <textarea style="height:100%;"></textarea>
     </div>
   </body>
   <script type="text/javascript">
@@ -246,24 +220,68 @@
       }// End Function _utf8_decode 
 
     }
-    let viewContainer = document.querySelector('#view-content');
-    let editContainer = document.querySelector('#editor-content');
-    let geditor;
-    let menuContainer = document.getElementById('menu-tree');
-    let messageContainer = document.getElementById('message');
-    require.config({
-      paths: {
-        'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
+    // let viewContainer = document.querySelector('#view-content');
+    let editContainer = document.querySelector('#view-container');
+    let geditor = {
+      editor: null,
+      setValue: function(val) {
+        // this.editor.setValue(val);
+        this.editor.value(val);
+        if (this.editor.isPreviewActive()) {
+          this.editor.togglePreview();
+          this.editor.togglePreview();
+        } else {
+          this.editor.togglePreview();
+        }
+      },
+      getValue: function() {
+        // return this.editor.getValue();
+        return this.editor.value();
       }
+    };
+    let menuContainer = document.getElementById('menu-tree');
+    // require.config({
+    //   paths: {
+    //     'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
+    //   }
+    // });
+    // require(['vs/editor/editor.main'], ()=>{
+    //   geditor.editor = monaco.editor.create(editContainer)
+    // }
+    // );
+    geditor.editor = new SimpleMDE({
+      element: editContainer.firstChild,
+      spellChecker: false,
+      showIcons: ["code", "table"],
+      styleSelectedText: false,
+      tabSize: 4,
+      previewRender: function(text, ele) {
+        if (!ele.classList.contains('markdown-body')) {
+          ele.classList.add('markdown-body');
+        }
+        markdown(text).then(function(res) {
+          ele.innerHTML = res;
+        });
+        return 'loading...';
+      },
+      toolbar: ["bold", "italic", "strikethrough", "heading", "quote", "code", "quote", "unordered-list", "ordered-list", "clean-block", "link", "image", "table", "horizontal-rule", "preview", "side-by-side", "fullscreen", "guide", {
+        name: 'save',
+        action: function(editor) {
+          save();
+        },
+        className: "fa fa-save",
+        title: "save"
+      }, {
+        name: 'create',
+        action: function(editor) {
+          add();
+        },
+        className: "fa fa-plus",
+        title: "create"
+      }]
     });
-    require(['vs/editor/editor.main'], ()=>{
-      geditor = monaco.editor.create(editContainer)
-    }
-    );
 
     function request(obj, json=true) {
-      messageContainer.innerHTML = `${obj.url} ...`;
-      messageContainer.style.color = 'black';
       return new Promise((resolve,reject)=>{
         let xhr = new XMLHttpRequest();
         xhr.open(obj.method || "GET", obj.url);
@@ -275,12 +293,8 @@
         }
         xhr.onload = ()=>{
           if (xhr.status >= 200 && xhr.status < 300) {
-            messageContainer.innerHTML = `${obj.url}`;
-            messageContainer.style.color = 'green';
             resolve(json ? JSON.parse(xhr.response) : xhr.response);
           } else {
-            messageContainer.innerHTML = `${obj.url}`;
-            messageContainer.style.color = 'red';
             reject(xhr.statusText);
           }
         }
@@ -381,13 +395,6 @@
       alert('save success ' + res.commit.message);
     }
 
-    async function edit() {
-      viewContainer.style.opacity = 0;
-      viewContainer.style.zIndex = -1;
-      editContainer.style.opacity = 1;
-      editContainer.style.zIndex = 0;
-    }
-
     async function markdown(text) {
       let res = await request({
         url: 'https://api.github.com/markdown',
@@ -400,32 +407,10 @@
       return res;
     }
 
-    async function view() {
-      viewContainer.style.opacity = 1;
-      viewContainer.style.zIndex = 0;
-      editContainer.style.opacity = 0;
-      editContainer.style.zIndex = -1;
-      let path = document.body.dataset.path;
-      let text = geditor.getValue();
-      let pos = path.lastIndexOf('.');
-      let ext = '';
-      if (pos != -1) {
-        ext = path.substr(pos);
-      }
-      if (ext == '.md') {
-        let raw = await markdown(text)
-        viewContainer.innerHTML = raw;
-      } else {
-        let temp = document.createElement("div");
-        temp.innerText = text;
-        viewContainer.innerHTML = `<pre>${temp.innerHTML}</pre>`;
-      }
-      viewContainer.scrollTop = 0;
-    }
-
     async function load(ele) {
       let dataset = ele.dataset;
-      if (dataset.type == 'dir') return;
+      if (dataset.type == 'dir')
+        return;
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
         headers: headers
@@ -434,7 +419,6 @@
       geditor.setValue(text);
       document.body.dataset.sha = dataset.sha;
       document.body.dataset.path = dataset.path;
-      view();
     }
 
     function init() {
