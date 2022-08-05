@@ -6,10 +6,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.2/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcdn.net/ajax/libs/simplemde/1.11.2/simplemde.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcdn.net/ajax/libs/simplemde/1.11.2/simplemde.min.js"></script>
     <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css" rel="stylesheet">
-    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script> -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
+    <script type="text/javascript">
+      var Base64 = {
+
+        // private property
+        _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="// public method for encoding
+        ,
+        encode: function(input) {
+          var output = "";
+          var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+          var i = 0;
+
+          input = Base64._utf8_encode(input);
+
+          while (i < input.length) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+
+            if (isNaN(chr2)) {
+              enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+              enc4 = 64;
+            }
+
+            output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+          }
+          // Whend 
+
+          return output;
+        }// End Function encode 
+
+        // public method for decoding
+        ,
+        decode: function(input) {
+          var output = "";
+          var chr1, chr2, chr3;
+          var enc1, enc2, enc3, enc4;
+          var i = 0;
+
+          input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+          while (i < input.length) {
+            enc1 = this._keyStr.indexOf(input.charAt(i++));
+            enc2 = this._keyStr.indexOf(input.charAt(i++));
+            enc3 = this._keyStr.indexOf(input.charAt(i++));
+            enc4 = this._keyStr.indexOf(input.charAt(i++));
+
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+
+            output = output + String.fromCharCode(chr1);
+
+            if (enc3 != 64) {
+              output = output + String.fromCharCode(chr2);
+            }
+
+            if (enc4 != 64) {
+              output = output + String.fromCharCode(chr3);
+            }
+
+          }
+          // Whend 
+
+          output = Base64._utf8_decode(output);
+
+          return output;
+        }// End Function decode 
+
+        // private method for UTF-8 encoding
+        ,
+        _utf8_encode: function(string) {
+          var utftext = "";
+          string = string.replace(/\r\n/g, "\n");
+
+          for (var n = 0; n < string.length; n++) {
+            var c = string.charCodeAt(n);
+
+            if (c < 128) {
+              utftext += String.fromCharCode(c);
+            } else if ((c > 127) && (c < 2048)) {
+              utftext += String.fromCharCode((c >> 6) | 192);
+              utftext += String.fromCharCode((c & 63) | 128);
+            } else {
+              utftext += String.fromCharCode((c >> 12) | 224);
+              utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+              utftext += String.fromCharCode((c & 63) | 128);
+            }
+
+          }
+          // Next n 
+
+          return utftext;
+        }// End Function _utf8_encode 
+
+        // private method for UTF-8 decoding
+        ,
+        _utf8_decode: function(utftext) {
+          var string = "";
+          var i = 0;
+          var c, c1, c2, c3;
+          c = c1 = c2 = 0;
+
+          while (i < utftext.length) {
+            c = utftext.charCodeAt(i);
+
+            if (c < 128) {
+              string += String.fromCharCode(c);
+              i++;
+            } else if ((c > 191) && (c < 224)) {
+              c2 = utftext.charCodeAt(i + 1);
+              string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+              i += 2;
+            } else {
+              c2 = utftext.charCodeAt(i + 1);
+              c3 = utftext.charCodeAt(i + 2);
+              string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+              i += 3;
+            }
+
+          }
+          // Whend 
+
+          return string;
+        }// End Function _utf8_decode 
+
+      }
+    </script>
     <style type="text/css">
       body {
         position: relative;
@@ -17,27 +147,6 @@
         width: 100%;
         padding: 0;
         margin: 0;
-      }
-
-      #menu-tree {
-        position: absolute;
-        width: 300px;
-        left: 0;
-        bottom: 0;
-        top: 0;
-        height: 100vh;
-        overflow-x: hidden;
-        overflow-y: scroll;
-      }
-
-      #view-container {
-        position: absolute;
-        left: 300px;
-        height: 100vh;
-        bottom: 0;
-        right: 0;
-        top: 0;
-        overflow: scroll;
       }
 
       .tree summary {
@@ -82,209 +191,143 @@
       .tree-item:hover::after {
         opacity: 1;
       }
-      .CodeMirror .editor-preview {
+
+      #menu-tree {
+        position: absolute;
+        width: 300px;
+        left: 0;
+        bottom: 0;
+        top: 0;
+        height: 100vh;
+        overflow-x: hidden;
+        overflow-y: scroll;
+      }
+
+      #view-container {
+        overflow: scroll;
+        position: absolute;
+        left: 300px;
+        height: 100vh;
+        bottom: 0;
+        right: 0;
+        top: 0;
+      }
+
+      .view-tool {
+        padding: 0 20px;
+        margin: 0;
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+        background: #fff;
+      }
+
+      .view-tool li {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        cursor: pointer;
+      }
+
+      #view-content {
+        top: 80px;
+        z-index: 0;
+        opacity: 1;
+        padding: 0 20px;
+        position: absolute;
+      }
+
+      #editor-content {
+        z-index: -1;
+        opacity: 0;
+        width: 100%;
         overflow: hidden;
+        bottom: 0;
+        right: 0;
+        top: 40px;
+        position: absolute;
       }
     </style>
   </head>
   <body>
     <div id="menu-tree" class="tree"></div>
     <div id="view-container">
-      <textarea style="height:100%;"></textarea>
+      <ul class="view-tool">
+        <li onclick="snippet('****', 2)">
+          <i class="fa fa-bold"></i>
+        </li>
+        <li onclick="snippet('**', 1)">
+          <i class="fa fa-italic"></i>
+        </li>
+        <li onclick="snippet('~~~~')">
+          <i class="fa fa-strikethrough"></i>
+        </li>
+        <li onclick="snippet('#')">
+          <i class="fa fa-header"></i>
+        </li>
+        <li onclick="snippet('>')">
+          <i class="fa fa-quote-left"></i>
+        </li>
+        <li onclick="snippet('```\n```')">
+          <i class="fa fa-code"></i>
+        </li>
+        <li onclick="snippet('>')">
+          <i class="fa fa-quote-left"></i>
+        </li>
+        <li onclick="snippet('*')">
+          <i class="fa fa-list-ul"></i>
+        </li>
+        <li onclick="snippet('1.')">
+          <i class="fa fa-list-ol"></i>
+        </li>
+        <li onclick="snippet('[](http://)', 10)">
+          <i class="fa fa-link"></i>
+        </li>
+        <li onclick="snippet('![](http://)', 10)">
+          <i class="fa fa-image"></i>
+        </li>
+        <li onclick="snippet('| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |')">
+          <i class="fa fa-table"></i>
+        </li>
+        <li onclick="snippet('-----')">
+          <i class="fa fa-minus"></i>
+        </li>
+        <li onclick="toggle_view()">
+          <i class="fa fa-edit"></i>
+        </li>
+        <li onclick="preview()">
+          <i class="fa fa-eye no-disable"></i>
+        </li>
+        <li onclick="save()">
+          <i class="fa fa-save"></i>
+        </li>
+        <li onclick="add()">
+          <i class="fa fa-plus"></i>
+        </li>
+      </ul>
+      <div id="view-content" class="markdown-body">welcome</div>
+      <div id="editor-content"></div>
     </div>
   </body>
   <script type="text/javascript">
-    var Base64 = {
-
-      // private property
-      _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="// public method for encoding
-      ,
-      encode: function(input) {
-        var output = "";
-        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-        var i = 0;
-
-        input = Base64._utf8_encode(input);
-
-        while (i < input.length) {
-          chr1 = input.charCodeAt(i++);
-          chr2 = input.charCodeAt(i++);
-          chr3 = input.charCodeAt(i++);
-
-          enc1 = chr1 >> 2;
-          enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-          enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-          enc4 = chr3 & 63;
-
-          if (isNaN(chr2)) {
-            enc3 = enc4 = 64;
-          } else if (isNaN(chr3)) {
-            enc4 = 64;
-          }
-
-          output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-        }
-        // Whend 
-
-        return output;
-      }// End Function encode 
-
-      // public method for decoding
-      ,
-      decode: function(input) {
-        var output = "";
-        var chr1, chr2, chr3;
-        var enc1, enc2, enc3, enc4;
-        var i = 0;
-
-        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        while (i < input.length) {
-          enc1 = this._keyStr.indexOf(input.charAt(i++));
-          enc2 = this._keyStr.indexOf(input.charAt(i++));
-          enc3 = this._keyStr.indexOf(input.charAt(i++));
-          enc4 = this._keyStr.indexOf(input.charAt(i++));
-
-          chr1 = (enc1 << 2) | (enc2 >> 4);
-          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-          chr3 = ((enc3 & 3) << 6) | enc4;
-
-          output = output + String.fromCharCode(chr1);
-
-          if (enc3 != 64) {
-            output = output + String.fromCharCode(chr2);
-          }
-
-          if (enc4 != 64) {
-            output = output + String.fromCharCode(chr3);
-          }
-
-        }
-        // Whend 
-
-        output = Base64._utf8_decode(output);
-
-        return output;
-      }// End Function decode 
-
-      // private method for UTF-8 encoding
-      ,
-      _utf8_encode: function(string) {
-        var utftext = "";
-        string = string.replace(/\r\n/g, "\n");
-
-        for (var n = 0; n < string.length; n++) {
-          var c = string.charCodeAt(n);
-
-          if (c < 128) {
-            utftext += String.fromCharCode(c);
-          } else if ((c > 127) && (c < 2048)) {
-            utftext += String.fromCharCode((c >> 6) | 192);
-            utftext += String.fromCharCode((c & 63) | 128);
-          } else {
-            utftext += String.fromCharCode((c >> 12) | 224);
-            utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-            utftext += String.fromCharCode((c & 63) | 128);
-          }
-
-        }
-        // Next n 
-
-        return utftext;
-      }// End Function _utf8_encode 
-
-      // private method for UTF-8 decoding
-      ,
-      _utf8_decode: function(utftext) {
-        var string = "";
-        var i = 0;
-        var c, c1, c2, c3;
-        c = c1 = c2 = 0;
-
-        while (i < utftext.length) {
-          c = utftext.charCodeAt(i);
-
-          if (c < 128) {
-            string += String.fromCharCode(c);
-            i++;
-          } else if ((c > 191) && (c < 224)) {
-            c2 = utftext.charCodeAt(i + 1);
-            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-            i += 2;
-          } else {
-            c2 = utftext.charCodeAt(i + 1);
-            c3 = utftext.charCodeAt(i + 2);
-            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-            i += 3;
-          }
-
-        }
-        // Whend 
-
-        return string;
-      }// End Function _utf8_decode 
-
-    }
-    // let viewContainer = document.querySelector('#view-content');
-    let editContainer = document.querySelector('#view-container');
-    let geditor = {
-      editor: null,
-      setValue: function(val) {
-        // this.editor.setValue(val);
-        this.editor.value(val);
-        if (this.editor.isPreviewActive()) {
-          this.editor.togglePreview();
-          this.editor.togglePreview();
-        } else {
-          this.editor.togglePreview();
-        }
-      },
-      getValue: function() {
-        // return this.editor.getValue();
-        return this.editor.value();
-      }
-    };
+    let viewContainer = document.querySelector('#view-content');
+    let editContainer = document.querySelector('#editor-content');
+    let geditor;
     let menuContainer = document.getElementById('menu-tree');
-    // require.config({
-    //   paths: {
-    //     'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
-    //   }
-    // });
-    // require(['vs/editor/editor.main'], ()=>{
-    //   geditor.editor = monaco.editor.create(editContainer)
-    // }
-    // );
-    geditor.editor = new SimpleMDE({
-      element: editContainer.querySelector('textarea'),
-      spellChecker: false,
-      showIcons: ["code", "table"],
-      styleSelectedText: false,
-      tabSize: 4,
-      autoDownloadFontAwesome: false,
-      previewRender: function(text, ele) {
-        if (!ele.classList.contains('markdown-body')) {
-          ele.classList.add('markdown-body');
-        }
-        markdown(text).then(function(res) {
-          ele.innerHTML = res;
-        });
-        return 'loading...';
-      },
-      toolbar: ["bold", "italic", "strikethrough", "heading", "quote", "code", "quote", "unordered-list", "ordered-list", "clean-block", "link", "image", "table", "horizontal-rule", "preview", "side-by-side", "fullscreen", "guide", {
-        name: 'save',
-        action: function(editor) {
-          save();
-        },
-        className: "fa fa-save",
-        title: "save"
-      }, {
-        name: 'create',
-        action: function(editor) {
-          add();
-        },
-        className: "fa fa-plus",
-        title: "create"
-      }]
+    let messageContainer = document.getElementById('message');
+
+    require.config({
+      paths: {
+        'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs'
+      }
     });
+    require(['vs/editor/editor.main'], ()=>{
+      geditor = monaco.editor.create(editContainer, {
+        language: 'markdown'
+      })
+    }
+    );
 
     function request(obj, json=true) {
       return new Promise((resolve,reject)=>{
@@ -322,7 +365,6 @@
 
     function get_repos() {
       return url.searchParams.get("repos");
-      ;
     }
 
     let headers = {
@@ -400,22 +442,67 @@
       alert('save success ' + res.commit.message);
     }
 
-    async function markdown(text) {
+    async function show_edit() {
+      viewContainer.style.opacity = 0;
+      viewContainer.style.display = 'none';
+      viewContainer.style.zIndex = -1;
+      editContainer.style.opacity = 1;
+      editContainer.style.zIndex = 0;
+
+      document.body.dataset.mode = 'edit';
+    }
+
+    function show_view() {
+      viewContainer.style.opacity = 1;
+      viewContainer.style.zIndex = 0;
+      viewContainer.style.display = 'block';
+      editContainer.style.opacity = 0;
+      editContainer.style.zIndex = -1;
+      document.body.dataset.mode = 'view';
+    }
+
+    function toggle_view() {
+      if (document.body.dataset.mode == 'view') {
+        show_edit();
+      } else {
+        show_view();
+      }
+    }
+
+    function snippet(text, offset=0) {
+      if (document.body.dataset.mode != 'edit') {
+        return;
+      }
+      geditor.trigger('keyboard', 'type', {
+        text
+      });
+      if (offset == 0) {
+        return;
+      }
+      let position = geditor.getPosition();
+      position.column -= offset;
+      geditor.focus();
+      geditor.setPosition(position);
+    }
+
+    async function preview() {
+      show_view();
       let res = await request({
         url: 'https://api.github.com/markdown',
         headers,
         method: 'POST',
         body: JSON.stringify({
-          text: text
+          text: geditor.getValue()
         })
-      }, false)
-      return res;
+      }, false);
+      viewContainer.innerHTML = res;
     }
 
     async function load(ele) {
       let dataset = ele.dataset;
       if (dataset.type == 'dir')
         return;
+      viewContainer.innerHTML = 'loading...';
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
         headers: headers
@@ -424,10 +511,22 @@
       geditor.setValue(text);
       document.body.dataset.sha = dataset.sha;
       document.body.dataset.path = dataset.path;
+      document.title = dataset.path;
+      document.body.dataset.mode = 'view';
+      let preview = await request({
+        url: 'https://api.github.com/markdown',
+        headers,
+        method: 'POST',
+        body: JSON.stringify({
+          text: text
+        })
+      }, false);
+      viewContainer.innerHTML = preview;
     }
 
     function init() {
       render_menu();
+      document.body.dataset.mode = 'view';
     }
 
     init();
