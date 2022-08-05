@@ -251,6 +251,10 @@
         top: 40px;
         position: absolute;
       }
+
+      .icon {
+        width: 20px;
+      }
     </style>
   </head>
   <body>
@@ -386,11 +390,15 @@
         })
         for (let i = 0; i < list.length; i++) {
           let item = list[i];
+          let icon = 'fa fa-file icon';
+          if (item.type == 'dir') {
+            icon = 'fa fa-folder icon';
+          }
           html += `<details  
                 data-type="${item.type}" 
                 data-path="${item.path}" 
                 data-sha="${item.sha}"  
-                onclick="load(this)"><summary><span class="tree-item">${item.name}</span></summary>`;
+                onclick="load(this)"><summary><span class="tree-item"> <i class="${icon}"></i> ${item.name}</span></summary>`;
           if (item.type == 'dir') {
             await fn(item.path);
           }
@@ -402,7 +410,6 @@
       }
       await fn('');
     }
-
     async function add() {
       let path = prompt('请输入路径名');
       if (path === null) {
