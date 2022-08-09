@@ -358,7 +358,7 @@
     };
     let user = get_user();
     let repos = get_repos();
-    async function render_menu(ele) {
+    async function render_menu(ele, event) {
       if (ele.dataset.path != '') {
         let icon_ele = ele.querySelector('.tree-item i');
         if (icon_ele.classList.contains('fa-angle-right')) {
@@ -369,7 +369,9 @@
           icon_ele.classList.add('fa-angle-right');
         }
       }
-
+      if (event) {
+        event.stopPropagation();
+      }
       if (ele.dataset.load == 'load') {
         return;
       }
@@ -386,7 +388,7 @@
           icon = 'fa-folder';
           folder_icon = 'fa-angle-right';
         }
-        let cb = item.type == 'dir' ? 'render_menu(this)' : 'load(this, event)';
+        let cb = item.type == 'dir' ? 'render_menu(this, event)' : 'load(this, event)';
         html += `<details  
               data-type="${item.type}" 
               data-path="${item.path}" 
@@ -527,7 +529,7 @@
     }
 
     function init() {
-      render_menu(menuContainer);
+      render_menu(menuContainer, null);
       document.body.dataset.mode = 'view';
     }
 
