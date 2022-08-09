@@ -151,12 +151,7 @@
 
       .tree summary {
         outline: 0;
-        padding-left: 20px;
         list-style: none;
-      }
-
-      .tree summary:not(:only-child) {
-        background: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.354 2.646A.5.5 0 0 0 4.5 3v6a.5.5 0 0 0 .854.354l3-3a.5.5 0 0 0 0-.708l-3-3z' fill='%23000' fill-opacity='.45'/%3E%3C/svg%3E") 4px center no-repeat;
       }
 
       .tree details {
@@ -166,30 +161,13 @@
       .tree-item {
         display: flex;
         align-items: center;
+        padding-left: 400px;
+        margin-left: -400px;
         height: 46px;
         font-size: 15px;
         line-height: 22px;
         color: rgba(0, 0, 0, 0.85);
-        padding-left: 400px;
-        margin-left: -400px;
-        cursor: default;
-      }
-
-      .tree-item::after {
-        content: '';
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        height: 38px;
-        background: #EEF2FF;
-        border-radius: 8px;
-        z-index: -1;
-        opacity: 0;
-        transition: .2s;
-      }
-
-      .tree-item:hover::after {
-        opacity: 1;
+        cursor: pointer;
       }
 
       #menu-tree {
@@ -253,12 +231,13 @@
       }
 
       .icon {
+        display: inline-block;
         width: 20px;
       }
     </style>
   </head>
   <body>
-    <div id="menu-tree" class="tree"></div>
+    <div id="menu-tree" class="tree" data-path=""></div>
     <div id="view-container">
       <ul class="view-tool">
         <li onclick="snippet('****', 2)">
@@ -379,36 +358,47 @@
     };
     let user = get_user();
     let repos = get_repos();
-    async function render_menu() {
-      menuContainer.innerHTML = '';
-      let html = '';
-      let shadow_html = '';
-      let fn = async(path)=>{
-        let list = await request({
-          url: 'https://api.github.com/repos/' + user + '/' + repos + '/contents/' + path,
-          headers: headers
-        })
-        for (let i = 0; i < list.length; i++) {
-          let item = list[i];
-          let icon = 'fa fa-file icon';
-          if (item.type == 'dir') {
-            icon = 'fa fa-folder icon';
-          }
-          html += `<details  
-                data-type="${item.type}" 
-                data-path="${item.path}" 
-                data-sha="${item.sha}"  
-                onclick="load(this)"><summary><span class="tree-item"> <i class="${icon}"></i> ${item.name}</span></summary>`;
-          if (item.type == 'dir') {
-            await fn(item.path);
-          }
-          html += '</details>';
+    async function render_menu(ele) {
+      if (ele.dataset.path != '') {
+        let icon_ele = ele.querySelector('.tree-item i');
+        if (icon_ele.classList.contains('fa-angle-right')) {
+          icon_ele.classList.remove('fa-angle-right');
+          icon_ele.classList.add('fa-angle-down');
+        } else {
+          icon_ele.classList.remove('fa-angle-down');
+          icon_ele.classList.add('fa-angle-right');
         }
-        shadow_html += html;
-        html = '';
-        menuContainer.innerHTML = shadow_html;
       }
-      await fn('');
+
+      if (ele.dataset.load == 'load') {
+        return;
+      }
+      let list = await request({
+        url: 'https://api.github.com/repos/' + user + '/' + repos + '/contents/' + ele.dataset.path,
+        headers: headers
+      })
+      let html = '';
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+        let icon = 'fa-file';
+        let folder_icon = '';
+        if (item.type == 'dir') {
+          icon = 'fa-folder';
+          folder_icon = 'fa-angle-right';
+        }
+        let cb = item.type == 'dir' ? 'render_menu(this)' : 'load(this, event)';
+        html += `<details  
+              data-type="${item.type}" 
+              data-path="${item.path}" 
+              data-sha="${item.sha}" 
+              onclick="${cb}"><summary class="tree-item">
+              <i class="icon fa ${folder_icon}"></i>
+              <i class="icon fa ${icon}"></i><span>${item.name}</span></summary>`;
+        html += '</details>';
+      }
+
+      ele.innerHTML += html;
+      ele.dataset.load = 'load';
     }
     async function add() {
       let path = prompt('请输入路径名');
@@ -508,10 +498,12 @@
       viewContainer.innerHTML = res;
     }
 
-    async function load(ele) {
+    async function load(ele, event) {
+      event.stopPropagation();
       let dataset = ele.dataset;
-      if (dataset.type == 'dir')
+      if (dataset.type == 'dir') {
         return;
+      }
       viewContainer.innerHTML = 'loading...';
       let res = await request({
         url: 'https://api.github.com/repos/' + user + '/' + repos + "/git/blobs/" + dataset.sha,
@@ -535,7 +527,7 @@
     }
 
     function init() {
-      render_menu();
+      render_menu(menuContainer);
       document.body.dataset.mode = 'view';
     }
 
