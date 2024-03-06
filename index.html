@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.2/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
     <script type="text/javascript" src="./js/base64.js"></script>
     <style type="text/css">
@@ -164,8 +164,11 @@
         <li onclick="add()">
           <i class="fa fa-plus"></i>
         </li>
+        <li onclick="set_token()">
+          <i class="fa fa-database"></i>
+        </li>
       </ul>
-      <div id="view-content" class="markdown-body">welcome</div>
+      <div id="view-content" class="markdown-body">md文档查看器</div>
       <div id="editor-content"></div>
     </div>
   </body>
@@ -211,18 +214,21 @@
       );
     }
 
-    const url = new URL(window.location.href);
+    const url = new URL(window.location.search.replace('?', ''));
+
+    const git_user = url.pathname.split('/')[1];
+    const git_repos = url.pathname.split('/')[2];
 
     function get_token() {
       return window.localStorage.getItem('github-token');
     }
 
     function get_user() {
-      return url.searchParams.get("user");
+      return git_user;
     }
 
     function get_repos() {
-      return url.searchParams.get("repos");
+      return git_repos;
     }
 
     let headers = {
@@ -273,6 +279,22 @@
 
       ele.innerHTML += html;
       ele.dataset.load = 'load';
+    }
+
+    function set_token()
+    {
+
+      let token = prompt('请设置token');
+      if (token === null) {
+        return;
+      }
+      if (token.length == 0) {
+        alert('token不能为空');
+        return;
+      }
+      localStorage.setItem('github-token', token);
+      window.location.reload();
+
     }
     async function add() {
       let path = prompt('请输入路径名');
@@ -359,17 +381,20 @@
       geditor.setPosition(position);
     }
 
+    const md = markdownit({html: true});
+
+
     async function preview() {
       show_view();
-      let res = await request({
+      /*let res = await request({
         url: 'https://api.github.com/markdown',
         headers,
         method: 'POST',
         body: JSON.stringify({
           text: geditor.getValue()
         })
-      }, false);
-      viewContainer.innerHTML = res;
+      }, false);*/
+      viewContainer.innerHTML = md.render(geditor.getValue());
     }
 
     async function load(ele, event) {
@@ -389,15 +414,16 @@
       document.body.dataset.path = dataset.path;
       document.title = dataset.path;
       document.body.dataset.mode = 'view';
-      let preview = await request({
-        url: 'https://api.github.com/markdown',
-        headers,
-        method: 'POST',
-        body: JSON.stringify({
-          text: text
-        })
-      }, false);
-      viewContainer.innerHTML = preview;
+      // let preview = await request({
+      //   url: 'https://api.github.com/markdown',
+      //   headers,
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //     text: text
+      //   })
+      // }, false);
+      viewContainer.innerHTML = md.render(text);;
+
     }
 
     function init() {
