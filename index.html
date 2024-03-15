@@ -104,9 +104,18 @@
         display: inline-block;
         width: 20px;
       }
+      #progress {
+        height: 4px;
+        background: #006ab1;
+        z-index:9999999;
+        position: absolute;
+        left: 0%;
+        right: 80%;
+      }
     </style>
   </head>
   <body>
+    <div id="progress"></div>
     <div id="menu-tree" class="tree" data-path=""></div>
     <div id="view-container">
       <ul class="view-tool">
@@ -206,12 +215,24 @@
           } else {
             reject(xhr.statusText);
           }
+          set_progress(100);
         }
-        ;
+        xhr.onreadystatechange = function () {
+          set_progress(xhr.readyState * 25);
+        }
         xhr.onerror = ()=>reject(xhr.statusText);
         xhr.send(obj.body);
+
+        set_progress(25);
+
       }
       );
+    }
+
+    function set_progress(progress)
+    {
+
+      document.getElementById('progress').style.right = `${100 - progress}%`
     }
 
     const url = new URL(window.location.search.replace('?', ''));
