@@ -430,6 +430,7 @@
       render_menu(menuContainer, null);
       document.body.dataset.mode = 'view';
       document.body.dataset.menu = 'open';
+      document.addEventListener('paste', handle_past);
     }
 
     function toggle_menu() {
@@ -445,6 +446,24 @@
       }
     }
 
+    function handle_past(e)
+    {
+      const items = e.clipboardData.items;
+      if (items.length == 0) return;
+      if (items[0].type.indexOf('image') === -1) return;
+      const file = items[0].getAsFile();
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        var base64 = reader.result;
+        const id = +new Date();
+        const fmt = `[${id}]:${base64}\n\n![image][${id}]\n\n`;
+        snippet(fmt);
+      };
+    }
+
     init();
+    
   </script>
 </html>
