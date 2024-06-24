@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.10.1/min/vs/loader.js"></script>
+  <style>
+    #editor-content {
+        flex:1;overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" style="height: 100vh;display: flex;flex-direction: column;">
+    <div id="editor-content"></div>
+  </div>
+  <script>
+    let editContainer = document.querySelector('#editor-content');
+    let geditor = null;
+    require.config({
+      paths: {
+        'vs': 'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.10.1/min/vs'
+      }
+    });
+
+
+    function get_editor(options) {
+        return new Promise((resolve, reject) => {
+            require(['vs/editor/editor.main'], () => {
+                geditor = monaco.editor.create(editContainer, options);
+                resolve(geditor);
+            });
+
+        });
+    }
+
+    function get_monaco(options) {
+        return new Promise((resolve, reject) => {
+            require(['vs/editor/editor.main'], () => {
+                resolve(monaco);
+            });
+
+        });
+    }
+    function get_edit_ele() { return editContainer;}
+
+    function get_document() {return document;}
+    
+  </script>
+</body>
+
+</html>
